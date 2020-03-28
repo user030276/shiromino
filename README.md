@@ -12,7 +12,7 @@ the libraries and use the official [CMake Windows
 distribution](https://cmake.org/download/). You can also build on Windows in an
 [MSYS2](https://www.msys2.org/) environment.
 
-## Building and running on Windows with Vcpkg
+## Building and running on Windows with Visual Studio and Vcpkg
 TODO
 
 ## Building and running on Linux or similar command line environments
