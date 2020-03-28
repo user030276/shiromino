@@ -22,7 +22,7 @@ TODO
 $ sudo apt install g++-7 cmake libsdl2-devel libsdl2-image-dev libsdl2-mixer-dev libogg-dev libvorbis-dev libsqlite3-dev
 
 # Install packages on Arch Linux-based (Manjaro, etc.) distributions.
-$ sudo pacman -S gcc cmake sdl2 sdl2_image sdl2_mixer ligbogg libvorbis sqlite
+$ sudo pacman -S gcc cmake sdl2 sdl2_image sdl2_mixer libogg libvorbis sqlite
 
 # Install packages in a Windows MSYS2 64-bit environment.
 $ pacman -S gcc cmake mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_mixer mingw-w64-x86_64-libogg  mingw-w64-x86_64-libvorbis sqlite3
