@@ -18,7 +18,7 @@ TODO
 ## Building and running on Linux or similar command line environments
 ```shell
 # Install packages on Debian-based distributions.
-# GCC 7 or newer (gcc-7, gcc-8, etc. for Debian) is required, for C++17 language support.
+# GCC 7 or newer (g++-7, g++-8, etc. for Debian) is required, for C++17 language support.
 $ sudo apt install g++-7 cmake libsdl2-devel libsdl2-image-dev libsdl2-mixer-dev libogg-dev libvorbis-dev libsqlite3-dev
 
 # Install packages on Arch Linux-based (Manjaro, etc.) distributions.
