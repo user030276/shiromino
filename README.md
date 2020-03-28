@@ -30,7 +30,13 @@ $ pacman -S gcc cmake mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_image mingw-w6
 $ cd shiromino
 $ mkdir build
 $ cd build
+
+# Use this for Linux.
 $ cmake ..
+
+# Use this on Windows with MSYS2.
+$ cmake -G "MSYS Makefiles" ..
+
 # Omit -j$(nproc) if your platform doesn't have nproc.
 $ make -j$(nproc)
 $ cd ..
