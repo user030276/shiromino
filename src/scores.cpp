@@ -188,6 +188,8 @@ void scoredb_add(struct scoredb *s, struct player* p, struct replay *r)
         check(ret == SQLITE_DONE, "Could not insert value into scores table: %s", sqlite3_errmsg(s->db));
 
         printf("Wrote replay (%zu): %s\n", replayLen, replayDescriptor.c_str());
+	// writing output to file somehow delays this printf
+	fflush(stdout);
     }
     catch (const logic_error& error) {
     }

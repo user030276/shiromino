@@ -2352,6 +2352,23 @@ int qs_process_lockflash(game_t *g)
             {
                 q->section_times[q->section] = q->timer.time - q->cur_section_timestamp;
                 q->cur_section_timestamp = q->timer.time;
+
+		// MHLs print section time code with pointer removed
+                int currentSectionTime = q->section_times[q->section];
+                int currentTime = q->timer.time;
+                int minutes = currentSectionTime / (60*60);
+                int seconds = (currentSectionTime / 60) % 60;
+                int centiseconds = (int)((double)(currentSectionTime % 60) * 100.0 / 60.0);
+
+                int cuMinutes = currentTime / (60*60);
+                int cuSeconds = (currentTime / 60) % 60;
+                int cuCentiseconds = (int)((double)(currentTime % 60) * 100.0 / 60.0);
+
+                int sectionBegin = q->section * 100;
+                int sectionEnd = sectionBegin + 99;
+                printf("%03d-%03d\t%d:%02d.%02d\t%d:%02d.%02d\n", sectionBegin, sectionEnd, minutes, seconds, centiseconds, cuMinutes, cuSeconds, cuCentiseconds);
+                fflush(stdout);
+
                 q->section++;
 
                 q->levelstop_time = 0;
