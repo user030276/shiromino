@@ -1,5 +1,5 @@
 jobs:
-  linux:
+  x64-linux:
     # TODO: Replace `ubuntu-20.04` with `ubuntu-latest` once GitHub updates the alias.
     # See: https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
     runs-on: ubuntu-20.04
@@ -8,7 +8,7 @@ jobs:
     - name: Fetch history for all tags
       run: .github/workflows/fetch-tags
     - name: Install dependencies
-      run: sudo apt-get update && sudo apt-get install -yq clang cmake coreutils gcc libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libogg-dev libvorbis-dev libsqlite3-dev
+      run: sudo apt-get update && sudo apt-get install -yq build-essential cmake coreutils gcc libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libvorbis-dev libsqlite3-dev
     - name: Build targets
       run: .github/workflows/build ${{ matrix.build-type }} ${{ matrix.compiler }}
     strategy:
@@ -19,14 +19,14 @@ jobs:
         build-type:
           - Debug
           - Release
-  mac-os:
+  x64-mac-os:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@master
     - name: Fetch history for all tags
       run: .github/workflows/fetch-tags
     - name: Install mac OS dependencies
-      run: brew install bash cmake gcc libogg libvorbis pkg-config sdl2 sdl2_image sdl2_mixer sqlite
+      run: brew install bash cmake gcc libvorbis pkg-config sdl2 sdl2_image sdl2_mixer
     - name: Build targets
       run: .github/workflows/build ${{ matrix.build-type }} ${{ matrix.compiler }}
     strategy:
@@ -37,7 +37,7 @@ jobs:
         build-type:
           - Debug
           - Release
-  windows:
+  windows-visual-studio:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@master
@@ -47,39 +47,75 @@ jobs:
     - name: Run vcpkg
       uses: lukka/run-vcpkg@v2
       with:
-        vcpkgArguments: libogg libvorbis sdl2 sdl2-image sdl2-mixer sqlite3
+        vcpkgArguments: libvorbis sdl2 sdl2-image sdl2-mixer[dynamic-load,libvorbis] sqlite3
         vcpkgDirectory: ${{ runner.workspace }}/vcpkg/
         vcpkgGitCommitId: 7db401cb1ef1fc559ec9f9ce814d064c328fd767
-        vcpkgTriplet: x64-windows
+        vcpkgTriplet: ${{ matrix.triplet }}
     - name: Build targets
       uses: lukka/run-cmake@v2
       with:
         buildDirectory: ${{ runner.workspace }}/build
+        cmakeAppendedArgs: -A ${{ matrix.cmake-architecture }}
         cmakeBuildType: ${{ matrix.build-type }}
         useVcpkgToolchainFile: true
-    - name: Upload binary
+    - if: matrix.build-type == 'Release'
+      name: Upload executable
       uses: actions/upload-artifact@v2
       with:
-        name: shiromino-${{ matrix.build-type }}-${{ github.sha }}
+        name: shiromino-windows-${{ matrix.architecture }}-${{ github.sha }}
         path: ${{ runner.workspace }}/build/Shiromino.exe
-    - name: Upload DSOs
+    - if: matrix.build-type == 'Release'
+      name: Upload DSOs
       uses: actions/upload-artifact@v2
       with:
-        name: shiromino-${{ matrix.build-type }}-${{ github.sha }}
+        name: shiromino-windows-${{ matrix.architecture }}-${{ github.sha }}
         path: ${{ runner.workspace }}/build/*.dll
-    - name: Filter assets
+    - if: matrix.build-type == 'Release'
+      name: Filter assets
       run: find . -maxdepth 1 ! -name audio ! -name gfx ! -name game.ini ! -name 'LICENSE*' ! -name README.md ! -name scores.db -exec rm -r {} \;
       shell: bash
-    - name: Upload assets
+    - if: matrix.build-type == 'Release'
+      name: Upload assets
       uses: actions/upload-artifact@v2
       with:
-        name: shiromino-${{ matrix.build-type }}-${{ github.sha }}
+        name: shiromino-windows-${{ matrix.architecture }}-${{ github.sha }}
         path: ${{ github.workspace }}
+    strategy:
+      matrix:
+        triplet:
+          - x64-windows
+          - x86-windows
+        build-type:
+          - Debug
+          - Release
+        include:
+          - architecture: x64
+            cmake-architecture: x64
+            triplet: x64-windows
+          - architecture: x86
+            cmake-architecture: Win32
+            triplet: x86-windows
+  x64-windows-msys2:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Fetch history for all tags
+      run: .github/workflows/fetch-tags
+    - uses: msys2/setup-msys2@v1
+    - name: Install dependencies
+      run: pacman --needed --noconfirm -S cmake gcc make mingw-w64-x86_64-{clang,dlfcn,libvorbis,SDL2{,_image,_mixer}} sqlite3
+      shell: msys2 {0}
+    - name: Build targets
+      run: .github/workflows/build ${{ matrix.build-type }} ${{ matrix.compiler }}
+      shell: msys2 {0}
     strategy:
       matrix:
         build-type:
           - Debug
           - Release
+        compiler:
+          - clang++
+          - g++
 name: build
 on:
   - pull_request
